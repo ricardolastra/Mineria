@@ -1,0 +1,400 @@
+---
+title: "GEDA - Tarea 3"
+author: "Ricardo Lastra"
+date: "6 de octubre de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tarea 3
+
+### Ejercicio 1
+
+GEDA de dataset de películas.
+
+```{r echo=T, warning=T, error=F, message=F}
+#Instalamos paqueterias
+#install.packages("ggplot2movies")
+#Cargamos librerias
+library(ggplot2movies)
+library(dplyr)
+library(scales)
+library(plotly)
+
+data(movies)
+head(movies)
+str(movies)
+
+```
+
+&nbsp;
+
+**Histograma sin outliers visto en clase:**
+
+```{r echo=T, warning=F, error=F, message=F}
+ggplot(movies, aes(x=length)) + 
+    xlim(0, 180) +
+    geom_histogram(binwidth = 1) +
+    xlab("Duración de películas en minutos") + 
+    theme_bw()
+```
+
+a. ¿Qué puedes decir de esta gráfica?
+
+*Se puede observar claramente que la mayoria de las peliculas tienen una duración entre 75 y 100 minutos, para observar esa región haremos un zoom en dicho intervalo: 
+
+```{r echo=T, warning=F, error=F, message=F}
+ggplot(movies, aes(x=length)) + 
+    xlim(75, 100) +
+    geom_histogram(binwidth = 0.5) +
+    xlab("Duración de películas en minutos") + 
+    theme_bw()
+```
+
+Tambien cambiamos el `binwidth` el cual nos permite visualizar que las peliculas de 90 minutos son las de mayor frecuencia. 
+
+Al realizarle un Zoom de la misma forma que en la gráfica anterior, nos percatamos realmente que casi no hay peliculas con duración entre 30 y 50 minutos, y visualmente se aprecia mejor en la siguiente gráfica:
+
+```{r echo=T, warning=F, error=F, message=F}
+ggplot(movies, aes(x=length)) + 
+    xlim(25, 50) +
+    geom_histogram(binwidth = 0.5) +
+    xlab("Duración de películas en minutos") + 
+    theme_bw()
+```
+
+
+&nbsp;
+
+
+b. ¿Cómo la modificas para agregar más ticks?
+
+Para modificar usamos la función `scale_x_continuous`, y en el `by` especificamos la escala de los ticks, quedando como sigue:
+
+```{r echo=T, warning=F, error=F, message=F}
+ggplot(movies, aes(x=length)) +  
+    scale_x_continuous(breaks = seq(from = 0, to = 180, by = 10), lim = c(0,180)) +
+    geom_histogram(binwidth = 1) +
+    xlab("Duración de películas en minutos") + 
+    theme_bw() 
+```
+
+&nbsp;
+
+c. Haz una gráfica que muestre que los picos de 7 y 90 minutos existían antes y después de 1980
+
+
+```{r echo=T, warning=F, error=F, message=F}
+ggplot(movies, aes(x=length)) +  
+  scale_x_continuous(breaks = seq(from = 7, to = 90, by = 7), lim = c(7,91)) +
+  geom_histogram(data=subset(movies %>%
+                               group_by(year) %>%
+                               filter(year < 1980)),binwidth = 1, fill = "blue", alpha = 0.5) +
+  geom_histogram(data = subset(movies %>%
+                                 group_by(year) %>%
+                                 filter(year > 1980)), binwidth = 1, fill = "red", alpha = 0.5) +
+  xlab("Duración de peliculas entre 7 y 9 min.     Red > 1980    &    Blue < 1980") + 
+  scale_fill_gradient("movies", low = "blue", high = "red") +
+  theme_bw() 
+```
+
+
+&nbsp;
+
+d. Existe la varaible `short` que indica si una película es "corta", ¿Qué gráfica puedes hacer para identificar el criterio que se ocupó para definir esta variable y cuáles están mal clasificadas? 
+
+Después de varias pruebas en visualizaciones, siguiendo los patrones de las graficas anteriores y sus análisis, generamos una variable adicional que identifica los *"0,1"* como peliculas cortas y largas, donde la mejor forma de visualizar como clasificarón dichas peliculas es con la siguiente grafica:
+
+```{r echo=T, warning=F, error=F, message=F}
+#Clasificación de peliculas por duración
+library(RColorBrewer)
+movies2 <- movies %>%
+  mutate(Short2= ifelse(Short==1,'Pelicula corta','Pelicula larga'))
+
+ggplot(movies2, aes(x = length, fill = Short2)) +
+  geom_histogram(aes(y = ..count..), binwidth = 1,
+                 position="identity", alpha=0.8) +
+  scale_x_continuous(breaks = seq(from = 0, to = 180, by = 10), lim = c(0,180)) +
+  theme_bw() +
+  scale_fill_brewer(palette="Accent") +
+  xlab("Duración en minutos de películas cortas y largas")
+```
+
+Sin embargo, en la grafica anterior no se pueden ver las mal clasificadas, hasta que generamos una grafica como *la siguiente*, donde despues de varias pruebas, hacemos un zoom en la zona de peliculas de menor duración, y apreciamos los puntos de corta duración que estan mal clasificados. 
+
+```{r echo=T, warning=F, error=F, message=F}
+#Puntos mal clasificados
+movies2 <- movies %>%
+  mutate(Short2= ifelse(Short==1,'Pelicula corta','Pelicula larga'))
+
+ggplot(movies2, aes(x = length, fill = Short2)) +
+  geom_dotplot(method="histodot", binwidth = 2) +
+  xlim(0,100)+
+  xlab("Duración en minutos de películas cortas y largas")
+```
+
+&nbsp;
+
+### Ejercicio 2
+
+GEDA de dataset de películas.
+
+
+#### Ejemplos
+
+Ahora veamos la varaible `rating` que representa el promedio de calificaciones de IMDB y la variable `votes` que representa el número de personas que calificaron la película
+
+```{r echo=T, warning=F, message=F, error=F}
+ggplot(movies, aes(x=votes, y=rating)) +
+  geom_point() +
+  ylim(1,10) + 
+  scale_x_continuous(label=comma) + 
+  theme_bw()
+```
+
+&nbsp;
+
+a. Agrega `alpha-blending` ¿Qué pasa con los outliers? ¿Diferentes valores funcionan mejor?
+
+Asi es, se puede apreciar en que zonas se acumulan el mayor numero de votos, que aunque no se modifica ninguna variable, por la intensidad del color, se manifiestan visualmente el numero de votos y la densidad del raiting.
+
+```{r echo=T, warning=F, message=F, error=F}
+ggplot(movies, aes(x=votes, y=rating)) +
+  geom_point(alpha=0.2) +
+  ylim(1,10) + 
+  scale_x_continuous(label=comma) + 
+  theme_bw()
+```
+
+&nbsp;
+
+b. ¿Cómo se ve la gráfica si remueves las películas con menos de 100 votos?
+
+El raiting se modifica, se aprecia que los limites de la escala (en casi 9 y 10) no existen para las peliculas con mas de 100 votos.
+
+```{r echo=T, warning=F, message=F, error=F}
+ggplot(movies, aes(x=votes, y=rating)) +
+  geom_point(alpha=0.2) +
+  ylim(1,10) + 
+  scale_x_continuous(breaks = seq(from = 100, to = 150000, by = 20000), lim = c(101,150000)) + 
+  theme_bw()
+```
+
+&nbsp;
+
+c. ¿Cómo se ve la gráfica si remueves todas las películas que tienen un rating arriba de 9?
+
+Solo se observa un ligero "zoom" o movimiento visual centrado en las peliculas con mayor desidad de votos.
+
+```{r echo=T, warning=F, message=F, error=F}
+ggplot(movies, aes(x=votes, y=rating)) +
+  geom_point(alpha=0.2) +
+  ylim(1,9) + 
+  scale_x_continuous(label=comma) + 
+  theme_bw()
+```
+
+&nbsp;
+
+### Ejercicio 3
+
+GEDA a dataset "Cars93"
+
+
+```{r echo=T, warning=F, message=F, error=F}
+library("MASS")
+data("Cars93")
+
+ggplot(Cars93, aes(x=Weight, y=MPG.city)) +
+  geom_smooth(colour="green") +
+  ylim(0, 50) + 
+  scale_x_continuous(label=comma) +
+  geom_point() +
+  theme_bw() 
+```
+
+&nbsp;
+
+a. ¿Cuál es el outlier de la izquierda?
+
+Para visualizarlo mejor, graficamos con `plotly` para identificar con *etiquetas* los diferentes puntos, donde el outlier de la izquierda corresponde al vehiculo con un peso de 1695 kg. y un rendimiento de 46 millas por galón.
+
+```{r echo=T, warning=F, message=F, error=F}
+library("MASS")
+data("Cars93")
+library(plotly)
+
+p <- qplot(Weight, MPG.city, data=Cars93)
+p <- p + geom_smooth(method = "glm", colour="green", formula = y~x, family = gaussian(link = 'log'))
+
+p <- ggplotly(p)
+p
+```
+
+
+&nbsp;
+
+b. En muchos países en lugar de medirse en millas por galón, se mide en litros por 100 km. ¿Qué pasa si graficas `MPG.city` contra `Horsepower`? ¿Existe una relación lineal? ¿Cuáles son los outliers?
+
+Curiosamente los `outliers` siguen siendo los mismos que en la grafica anterior, donde el vehiculo con rendimiento de 46 millas por galón y   es el de la izquierda tambien. 
+
+```{r echo=T, warning=F, message=F, error=F}
+library("MASS")
+data("Cars93")
+library(plotly)
+
+p <- qplot(Horsepower, MPG.city, data=Cars93)
+p <- p + geom_smooth(method = "glm", colour="red", formula = y~x, family = gaussian(link = 'log'))
+
+p <- ggplotly(p)
+p
+```
+
+&nbsp;
+
+### Ejercicio 4
+
+Dataset 
+
+```{r echo=T, message=F, error=F, warning=F}
+library(GGally)
+
+
+dplyr::select(Boston, -rad, -chas) %>% 
+ggpairs(title="Boston dataset", diag=list(continuous="density", axisLabels='none'))
+  
+```
+
+&nbsp;
+
+
+a. ¿Cuáles están positivamente correlacionados con `medv`?
+
+Los que estan correlacionados con `medv son:` 
+
+    + zn con Corr: *0.36
+    + rm con Corr: *0.695
+    + dis con Corr: 0.25
+    + black con Corr: 0.333
+    
+    Nota. rm & zn con mayor correlación.
+
+
+&nbsp;
+
+b. La variable `crim` -tasa de crímenes per cápita- tiene *scatterplots* con forma inusual, donde los valores altos de `crim` solo ocurren para un valor de la otra variable ¿Qué explicación le puedes dar?
+
+La explicación radica que que esas variables con valores especificos e inclusive altamente correlacionados, afectan a la variable de crímenes en los valores mas altos ya que son variables que mas explican el alza en crimenes, es decir, por ejemplo, un solo valor de edad esta en las tatas mas altas de crimenes ya que la `edad` esta altamente relacionada en que se cometan o no los crímenes. 
+
+&nbsp;
+
+c. Hay varias formas en los *scatterplots*, escoge 5 y explica cómo las interpretas
+
+#### Primer scatterplot
+
+Despues de varios análisis y de jugar un poco con las visualizaciones elegimos las siguienes 5 visualizaciones.
+
+Le damos un zoom a la relación de `age` y tasa de crímenes donde se observa que la barrera de los 35 años permite que se genere una mayor tasa de crimenes.
+
+```{r echo=T, message=F, error=F, warning=F}
+ggplot(Boston, aes(x=crim, y=age)) +
+  geom_point(color="blue",alpha=0.2) +
+  ylim(18,70) +
+  xlim(0,5) +
+  theme_bw()
+```
+
+#### Segunda scatterplot
+
+Nos llama la atención la variable `black`, que al revisarla contra el valor medio de los hogares, nos percatamos que lo que dice la variable mencionada es que la proporción de gente de color en cada pueblo es elevada en hogares de valores medios ($20,000). Se puede ver claramente en la siguiente scatterplot:
+
+```{r echo=T, message=F, error=F, warning=F}
+ggplot(Boston, aes(x=black, y=medv)) +
+  geom_point(color="red",alpha=0.2) +
+  xlim(350,400) +
+  theme_bw()
+```
+
+#### Tercera scatterplot
+
+Nos percatamos que la variable de `tax` puede tener missings en el rango de 500 y 650, además que superando la barrera de los 650 los valores de varias variables relacionadas con la mencionada se acumulan notablemente. Esto podria ser por que en este rango las oficinas recaudaradoras de impuestos no tienen contempladas viviendas en la zona. 
+
+```{r echo=T, message=F, error=F, warning=F}
+ggplot(Boston, aes(x=medv, y=tax)) +
+  geom_point(color="purple",alpha=0.2) +
+  theme_bw()
+```
+
+
+#### Cuarta scatterplot
+
+Curiosamente el numero de habitaciones por vivienda esta relacionado con la tasa de crímenes, donde es muy notorio e interesante que la densidad de eventos esta en las viviendas con entre 5 y 7 habitaciones.
+
+```{r echo=T, message=F, error=F, warning=F}
+ggplot(Boston, aes(x=crim, y=rm)) +
+  geom_point(alpha=0.2) +
+  theme_bw()
+```
+
+#### Quinta scatterplot
+
+Finalmente observamos dos variables que confirman hipótesis generadas en este dataset y en otros, donde las emisiones de de oxido de nitrógeno se acumulan en donde la distancia es menor recorrida a los centros de trabajo, esto se radica en que pueden ser ciudades con mayor afluencia vehicular, y en caso contrario, a mayor distancia (freeways), menor acumulación de oxido de nitrógeno.
+
+```{r echo=T, message=F, error=F, warning=F}
+ggplot(Boston, aes(x=dis, y=nox)) +
+  geom_point(color="orange",alpha=0.8) +
+  theme_bw()
+```
+
+&nbsp;
+
+### Ejercicio 5
+
+a. Usando el dataset `Boston` realiza un *pcp*, intenta resaltar las características que haz observado en los ejercicios anteriores. Piensa cómo le hiciste...
+
+Agregamos las primeras 6 variables mas una septima que indica la densisdad que indica el indice de accesibilidad a carreteras, donde en las diferentes escalas podemos ver como se pueden comparar diferentes variables en una sola visualización. 
+
+
+```{r echo=T, message=F, error=F, warning=F}
+Boston1 <- Boston
+names(Boston1) <- c(abbreviate(names(Boston)[1:5]), "rad")
+#str(Boston)
+a1 <- ggparcoord(Boston, columns = 1:5, 
+                 alphaLines = 0.7,  
+                 groupColumn = "rad") + 
+  ggtitle("General")
+a2 <- ggparcoord(Boston, columns = 1:5, 
+                 scale="uniminmax", 
+                 alphaLines=0.7, 
+                 groupColumn = "rad") + 
+  ggtitle("Esc1")
+a3 <- ggparcoord(Boston, columns = 1:5, 
+                 scale="globalminmax", 
+                 alphaLines=0.7, 
+                 groupColumn = "rad") + 
+  ggtitle("Esc2")
+a4 <- ggparcoord(Boston, columns = 1:5, 
+                 scale="center", 
+                 scaleSummary="median", 
+                 alphaLines=0.7, 
+                 groupColumn = "rad") +
+  ggtitle("Esc3")
+
+gridExtra::grid.arrange(a1, a2, a3, a4)
+```
+
+Esto corrobora que los crimenes estan altamente relacionados al acceso a las carreteras asi como la concentración de oxido de nitrógeno, que es donde se ilumina en azul claro en las 4 visualizaciones siguientes.
+
+&nbsp;
+
+### Conclusiones:
+
+Con esto, podemos concluir lo valioso que es realizar análisis GEDA para entender mejor nuestros data-sets y el negocio de forma muy general. 
+
+En mi opinión este tipo de ejercicios son básicos en las actividades diarias de un `Data Scientist`, particularmente cada uno de los detalles vistos contribuyen a generar visualizaciones de calidad. Tips como la forma de agregar `ticks` o la forma en como se genera un *pcp* con data sets amigables, son de gran ayuda para mejorar las habilidades en el dia a dia de los análisis GEDA.
+
+
+

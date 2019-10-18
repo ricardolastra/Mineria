@@ -1,0 +1,4 @@
+"0","lm(PO4 ~ oPO4, data)
+"
+"2","Error in eval(predvars, data, env) : object 'PO4' not found
+"

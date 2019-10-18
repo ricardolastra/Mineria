@@ -1,0 +1,8 @@
+"0","datan <- data %>%"
+"0","  select(-starts_with(""a"")) %>% "
+"0","  select(-which(sapply(.,is.character)))"
+"0","par(mfrow=c(2, 4))"
+"0","colnames <- dimnames(datan)[[2]]"
+"0","for (i in 1:7) {"
+"0","  boxplot(datan[,i], main=colnames[i], col=""lightblue"")"
+"0","}"

@@ -1,0 +1,931 @@
+---
+title: "EDA"
+author: "Liliana Millán, liliana.millan@gmail.com"
+date: "September 2017"
+output: 
+  html_document:
+    df_print: paged
+    highlight: tango
+    theme: lumen
+---
+
+![](../images/itam_logo.png)
+
+## Agenda  {.tabset .tabset-fade .tabset-pills}
+
++ EDA
+  + Tipos de EDA
+  + Visualizaciones incorrectas
++ Gráficas
++ Formas deseables de datos
++ Casos de estudio
+
+Estas notas estan basadas en el libro *Graphical Data Analysis with R*, la bibliografía se encuentra en el temario
+
+
+### Exploratory Data Analysis
+
+Es el PRIMER paso en el análisis de datos, es un punto CRÍTICO para realizar un análisis correcto -con contexto, sin sesgo, desde diferentes puntos de vista-
+
+Puedes pensarlo como la primera aproximación al problema que quieres resolver
+
+#### Objetivos 
+
++ Detectar de errores 
++ Detectar de datos anómalos, faltantes 
++ Detectar de datos aislados 
++ Verficar de que tienes datos relevantes y suficientes para contestar tu(s) pregunta(s)
++ Verificar si la(s) pregunta(s) es la correcta
+   + ¿se requiren más datos?
++ ¿Qué otras variables puedes obtener de este set de datos que te permitan contestar tu(s) pregunta(s)? $\rightarrow$ lo veremos en feature extraction / feature selection
++ Verificar de suposiciones -tuyas-
++ Selección preliminar de los modelos apropiados 
++ Determinar relaciones entre las variables explicativas
++ Evaluar la dirección y tamaño -aproximado- de las relaciones entre las variables explicativas y la(s) variable(s) de salida -variable target-
++ Empezar a visualizar cómo sería la respuesta a la(s) pregunta(s) que quieres contestar con este set de datos
++ También nos ayudará cuando querramos automatizar la evaluación y tuneo de modelos
+
+![](../images/pointer.png) Como verás ayuda a hacer un modelado más robusto
+
+![](../images/pointer.png) De manera no estricta, si un análisis de datos no incluye modelado estadístico formal y/o inferencia/predicción entonces el análisis es EDA
+
+#### Tipos de EDA 
+
+Normalmente los datos que tenemos para analizar vienen en un formato rectangular (..aunque nunca limpios ni cómo los necesitamos (╯°□°)╯︵ ┻━┻, pero lo veremos más adelante) donde un renglón es una observación de un *experimento* y cada columna es: el identificador del sujeto, la variable de salida y las variables explicativas.
+
+Analizar los datos de esta *tabla* resulta tedioso, aburrido y abrumador de entender, *enter EDA* :), las técnicas utilizadas en el EDA permiten esconder ciertas cosas de los datos para hacer sobresalir o dejar claras otras.
+
+Hay 2 grandes maneras cruzadas de clasificar el tipo de EDA: 
+
+1. Hacerlo de manera gŕafica o no -GEDA Graphical Exploratory Data Analysis, EDA Exploratory Data Analysis-
+2. Cada método es univariado o multivariado -nonrmalmente bivariada-
+
+
++ **Análisis exploratorio no gráfico:** Generalmente incluye calcular el resúmen estadístico de 
++ **Análisis exploratorio gráfico:** Resúmen los datos de forma gráfica 
++ **Univariada:** Analizan una variable a la vez 
++ **Multivariada:** Analizan 2 o más variables a la vez para explorar relaciones entre variables -normalmente bivariada-
+
+![](../images/pointer.png) Se recomienda primero hacer un EDA univariado a cada variable que forme parte de un EDA multivariado ANTES de hacer el EDA multivariado
+
+Después de clasificar en estos 4 tipos cruzados existen más divisiones al EDA basadas en: 
+
+a. El **rol de la variable**: salida o explicativa
+b. El **tipo de la variable**: categórica o numérica 
+
+
+#### Algunos consejos
+
++ Sí existen guías para qué técnica de EDA utilizar dependiendo de las circunstancias, pero normalmente eso se va mejorando con la experiencia
++ No existe un tipo óptimo de gráfica, prueba varias $\rightarrow$ aunque si hay reglas que debes seguir para la visualización
++ Antes de ponerte a hacer gráficas piensa qué quieres visualizar y por qué
+
+#### Ejemplos de lo que NO debes hacer en visualizaciones
+
++ NO Graficar pies! ¿por qué? 
+
+Aunque es una visualización muy solicitada por gente de negocio, existe una mejor manera de representar la misma información. El objetivo de una visualización de pie es mostrar cómo un 100% se distribuye entre diferentes valores de una variable. Una mejor manera de visualizar la misma información es haciendo una grfáica de barras horizontales ordenando de la proporción más grande a la más pequeña, el eje x tiene que ir de 0 a 100%.
+
+```{r echo=F, warning=F, error=F, message=F}
+library(ggplot2)
+library(plotly)
+library(knitr)
+library(dplyr)
+
+
+df <- data.frame(departamento=c("ventas","adquisiciones","rh","ti","finanzas","atencion_clientes","contabilidad"), 
+                 prop=c(1,3,4,5,7,20,60))
+
+df$departamento <- factor(df$departamento, levels=c("ventas","adquisiciones","rh","ti","finanzas","atencion_clientes","contabilidad"))
+
+
+ggplot(df, aes( x="",y=prop, fill=departamento)) +
+  geom_bar(width=1, stat="identity") +
+  coord_polar("y", start=0) + 
+  theme_bw() 
+
+
+ggplot(df, aes(y=prop, x=departamento, fill=departamento)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  theme_bw() +
+  scale_y_continuous(limits=c(0,100))
+
+
+```
+
+
+Si no te queda de otra más que presentar un pie, asegúrate que las proporciones suman 100%!, ordena las divisiones de mayor a menor...
+
+¿Algo malo aquí?
+
+![](../images/fake_data_visualizations_1.png)
+
+\* Imagen tomada de [flowingdata.com](https://flowingdata.com/2009/11/26/fox-news-makes-the-best-pie-chart-ever/)
+
+¿Qué? (╯°□°)╯︵ ┻━┻
+
+![](../images/fake_data_visualizations_2.png)
+
+\* Imagen tomada de [flowingdata.com](https://flowingdata.com/2010/05/14/wait-something-isnt-right-here/)
+
+Paren!!!! (╯°□°)╯︵ ┻━┻
+
+![](../images/fake_data_visualization_3.png)
+
+\* Imagen tomada de [flowingdata.com](https://flowingdata.com/2012/11/09/incredibly-divided-nation-in-a-map/)
+
+![](../images/pointer.png) Moraleja: Pon atención a tus visualizaciones son TAN IMPORTANTES como los modelos que realizas, es tu responsabilidad presentar información precisa, sin sesgo y que permita a los demás tomar decisiones basadas en ellas.
+
+Como **NO** hacer una gráfica de barras 
+
+![](../images/wrong_data_visualizations_1.png)
+
+\* Imagen tomada de [viz.wtf](http://viz.wtf/)
+
+
+No hagan esto!!!!  (╯°□°)╯︵ ┻━┻   $\rightarrow$ Por eso en esta clase están prohibidos los pie!!!
+
+![](../images/wrong_data_visualization_2.png)
+
+
+\* Imagen tomada de [viz.wtf](http://viz.wtf/)
+
+
+### Tipos de variables
+
++ Datos Numéricos
+    + Numéricas continuas: métricas, ...
+    + Numéricos discretos: conteos, enteros
++ Datos categóricos
+    + Categóricas nominales
+    + Categóricas ordinales -aunque muchas veces pueden ser tomados como numéricos-
++ Texto, audio, imágenes
+
+### EDA no gráfico
+
+#### Univariado
+
+##### Datos categóricos
+
+¿Qué podemos encontrar? 
+
++ Valores faltantes
++ Proporciones
++ Frecuencias
+
+$\rightarrow$ Generar una tabla de frecuencias de cada categoría. Por ejemplo:
+
+```{r echo=F, warning=F, message=F, error=F}
+df <- data.frame(category=c("girls","boys","women","man","total"),
+                 count=c(2,4,3,6,15),
+                 proportion=c(2/15,4/15,3/15,6/15, sum(2/15,4/15,3/15,6/15)))
+                 
+
+kable(df)
+```
+
+
+![](../images/pointer.png) Es muy importante obtener los totales para identificar errores, faltantes, anomalías en los datos
+
+##### Datos numéricos
+
+Quisieramos conocer algunas métricas de centralidad: modalidad (número de modas), mediana, media; dispersión: desviación estándar, forma -distribución teórica- para identificar si tiene colas pesadas: \*skewness -medida de asimetría- e identificación de outliers.
+
+**Skewness:** valores cercanos a 0 indican muy poco skewness, si el número es negativo la cola es a la izquierda, si el número es positivo la cola es a la derecha 
+
+![](../images/skewness.png)
+
+<br>
+
+La mayoría de estas métricas las puedes obtener con un `summary` en R. Por ejemplo: 
+
+```{r echo=T, warning=F, message=F, error=F}
+data(mtcars)
+
+glimpse(mtcars)
+summary(mtcars)
+```
+
+#### Multivariado
+
+En el análisis multivariado lo que queremos encontrar son relaciones entre varias columnas -normalmente 2- 
+
+##### Datos categóricos
+
++ Cuando queremos comparar 2 variables (con pocas categorías) se puede ocupar un **cross-tabulation** donde los valores de una variable se ponen en las columans y los valores de la otra variable en renglones para armar una matriz de frecuencias.
+
+Por ejemplo: 
+
+|Edad/Sexo|Mujer|Hombre|Total|
+|:---:|:---|:----:|:---:|
+|Jóven|2|3|**5**|
+|Adulto|3|5|**8**|
+|Adulto mayor|4|2|**6**|
+|**Total**|**9**|**10**|**19**|
+
+##### Datos numéricos
+
+Lo más común es obtener la correlación y la covarianza entre 2 variables numéricas. Con la covarianza queremos ver qué tanto cambia una variable si la otra lo hace. 
+
+Es más sencillo identificar estos cambios con la correlación, ya que esta va de [-1,1] donde -1 indica que las variables tiene una correlación lineal perfecta negativa, 1 indica que las variables tiene una correlación lineal perfecta positiva y 0 que las variables no tienen correlación. De nuevo, estas métricas son más sencillas de analizar visualmente-.
+
+Cuando se tienen más de 2 variables numéricas normalmente se realizan matrices de covarianzas y correlaciones.
+
+### GEDA 
+
+#### Datos Numéricos
+
+¿Qué podríamos encontrar?
+
++ Simetría/Asimetría
++ Huecos
++ Outliers
++ Multimodalidad
++ Amontonamientos (heaping)
++ Redondeos
++ Imposibilidades
++ Errores
+
+![](../images/pointer.png) ¿Cómo podríamos visualizar estas características? 
+
++ **Histograma**: Simetría/Asimetría, huecos, multimodalidad, aproximación a una distribución **empírica**
++ **Diagrama de caja y brazos** -boxplot-: outliers, amontonamientos
++ **Scatterplot**: Cada dato es un punto, permite identificar huecos
+* **Rugplot**: Gráfica que agrega pequeñas líneas verticales (eje x) u horizontales (eje y), se ocupa como un extra a un scatterplot, pero solo se recomienda cuando se tienen pocos datos $\rightarrow$ veremos ejemplos de esta gráfica
++ **Density estimate**: Como un modelo de tus datos... solo ten cuidado con los límites de las variables
++ **Distribution estimate**: Permite comparar distribuciones como por ejemplo si una está adelante de otra
++ **QQ-plot**: Permite comparar dos distribuciones, la tuya vs una teórica (por default la normal)
+
+
+#### Ejemplo
+
+El siguiente histograma corresponde a las velocidades del camponato mundial de ski del 2011, ¿qué puedes decir de la gráfica?
+
+![](../images/ski_histogram.png)
+
+<br>
+
+Con el siguiente histograma ¿cambia en algo la historia/conclusión/opinión que tenías con el histograma anterior? 
+
+![](../images/ski_gender_histogram.png)
+
+<br>
+
+![](../images/pointer.png) es por esto que debes hacer un análisis exploratorio profundo, ver todos los puntos de vista posibles -diferentes gráficas, diferentes análisis-
+
+#### Otro ejemplo
+
+¿Qué puedes decir de esta gráfica? 
+
+![](../images/berkeley_admissions.png)
+
+<br>
+
+¿Y ahora? 
+
+![](../images/berkeley_admission_gender.png)
+
+#### Otro ejemplo 
+
+Utilizaremos el set de datos de precios de vivienda de Boston que viene en el paquete `MASS`, este set de datos contiene 14 variables y 506 observaciones de áreas alrededor de la ciudad de Boston. 
+
++ crim: per capita crime rate by town
++ zn: proportion of residential land zoned for lots over 25,000 sq ft
++ indus: proportion of non-retail business acres per town
++ chas: Charles River dummy variable (=1 if tract  bound river; 0 otherwise)
++ nox: nitrogen oxiides concentration (parts per 10 million)
++ rm: average number of rooms per dwelling
++ age: proportion of onwer-occupied units built prior to 1940
++ dis: weighted mean of distances to fice Boston employment centres
++ rad: index of accessibility to radial highways
++ tax: full-value propoerty-tax rate per \\$10,000
++ ptratio: pupil-teacher ratio by town
++ black: proportion of blacks by town  ????
++ lstat: lower status of the population (percent)
++ medv: median value of owner-occupied homes in \\$1000
+
+```{r echo=T, warning=F, message=F, error=F}
+library(MASS)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+data("Boston")
+
+head(Boston)
+```
+
+En particular nos interesa revisar la varaible **medv** 
+
++ Empecemos sin visualización, generemos una tabla con los diferentes valores de *medv* para ver qué información podemos encontrar
+
+```{r echo=T, warning=F, message=F, error=F}
+table(Boston$medv)
+```
+
+Espero que no pienses diferente... pero tratar de sacar información de esta tabla esta difícil, solo podemos ver rápidamente que todos los números están redondeados a 1 decimal, fuera de eso... está complicado. Mejor visualizemos...
+
+```{r echo=T}
+ggplot(Boston, aes(x=medv)) + 
+  geom_histogram() + 
+  theme_bw() + 
+  ggtitle("Valor medio de las casas (en miles de dólares")
+```
+
+![](../images/pointer.png) Además del warning que regresa R al generar el histograma ¿qué información puedes extraer?
+
++ ¿Qué habrá pasado cuándo el valor *medv* anda en 25? Se ve una caída interesante
++ El valor de *medv* parece inusual ...
+
+¿Qué pasa si cambiamos el tamaño de los bines? 
+
+```{r echo=T, warning=F, error=F, message=F}
+ggplot(Boston, aes(x=medv)) + 
+  geom_histogram(binwidth=1) + 
+  theme_bw() + 
+  ggtitle("Valor medio de las casas (en miles de dólares")
+```
+
+Hay detalles que antes no se percibían, como que en 34 hay una caída que no se había identificado antes
+
+Ahora veamos todas las variables:
+
+```{r echo=T}
+B2 <- gather(Boston, bos_vars, bos_values, crim:medv)
+ggplot(B2, aes(bos_values)) +
+    geom_histogram() + 
+    theme_bw() + 
+    facet_wrap(~ bos_vars , scales = "free")
+```
+
+Este es un buen punto de partida, pero el tamaño de los bines no beneficia a todas las variables, cada variable debe tener su tamaño de bin adecuado, por otro lado la escala varía mucho entre variables: hay unas que van de 0 a 20 y otras de 0 a 400.
+
+#### Ejercicio
+
+1. Utiliza la variable *medv* para generar las siguientes gráficas en R: ¿Qué observas en cada una de estas gráficas?
+
++ `?boxplot`
++ `?stripchart` Un scatterplot de 1 dimensión, puede ser una alternativa al boxplot cuando tienes **pocos** datos
++ `?stem`
++ `?density` Necesitarás agregar un plot para ver la gráfica
++ `?rug` Primero necesitarás generar o el stripchart o el density para agregarle rug
+
+
+
+```{r echo=T, warning=F, message=F, error=F}
+#boxplot
+ggplot(Boston, aes(x="var", y=medv)) +
+  geom_boxplot() +
+  theme_bw() + 
+  coord_flip() +
+  ggtitle("boxplot variable medv")
+
+#stripchart
+stripchart(Boston$medv)
+
+#stem
+stem(Boston$medv)
+
+#density
+plot(density(Boston$medv))
+
+#rug
+rug(Boston$medv)
+```
+
+2. En la gráfica de las 14 variables mostrada arriba ¿Cómo describirías las distribuciones? ¿Para cuales variables sería mejor utilizar boxplot? ¿Por qué?
+
+```{r echo=T, warning=F, error=F, message=F}
+ggplot(Boston, aes(x="var", y=black)) +
+  geom_boxplot() +
+  theme_bw() +
+  coord_flip() + 
+  ggtitle("Boxplot variable black")
+
+ggplot(Boston, aes(x="var", y=crim)) +
+  geom_boxplot() +
+  theme_bw() +
+  coord_flip() + 
+  ggtitle("Boxplot variable crim")
+
+ggplot(Boston, aes(x="var", y=tax)) +
+  geom_boxplot() +
+  theme_bw() +
+  coord_flip() + 
+  ggtitle("Boxplot variable tax")
+
+ggplot(Boston, aes(x="var", y=zn)) +
+  geom_boxplot() +
+  theme_bw() +
+  coord_flip() + 
+  ggtitle("Boxplot variable zn")
+```
+
+#### Otro ejemplo 
+
+Veamos ahora un poco de outliers con un dataset de películas que viene en el paquete `ggplot2movies` -antes formaba parte del paquete ggplot pero se hizo su propio paquete para bajar el overhead de bajar ggplot2- 
+
+```{r echo=T, warning=T, error=F, message=F}
+library(ggplot2movies)
+library(dplyr)
+library(scales)
+library(plotly)
+
+data(movies)
+
+glimpse(movies) 
+
+## histograma
+ggplot(movies, aes(x=length)) + 
+  geom_histogram() +
+  scale_y_continuous(label=comma) + 
+  scale_x_continuous(label=comma) + 
+  theme_bw()
+
+```
+
+¯\\(º_o)/¯ chanclas... no dice mucho la gráfica... ¿o si? y además, ¿por qué sale más de 4,000 en longitud de la película? veamos qué hay ahí
+
+```{r echo=T, warning=F, error=F, message=F}
+movies %>% 
+filter(length > 2000) %>% 
+arrange(desc(length))
+```
+
+Para encontrar estos *outliers* es más sencillo hacer diagramas de caja y brazos
+
+```{r echo=T, warning=F, error=F, message=F}
+p <-ggplot(movies, aes(x="var", y=length)) +
+  geom_boxplot() +
+  scale_x_discrete(breaks=NULL) +
+  scale_y_continuous(label=comma) +
+  theme_bw() + 
+  coord_flip()
+
+p 
+
+#o con plotly para saber los numeros :P
+ggplotly(p)
+```
+
+Puedes obtener los outilers (valores) con la función boxplot 
+
+```{r echo=T, warning=F, error=F, message=F}
+outliers_info <- boxplot(movies$length)
+summary(outliers_info) # las cosas que te devuelve el outlier 
+
+# cuantos 
+format(outliers_info$out %>% length(), big.mark=",")
+```
+
+Veamos cómo se ve el histograma si quitamos estos valores atípicos
+
+```{r echo=T, warning=F, error=F, message=F}
+ggplot(movies, aes(x=length)) + 
+    xlim(0, 180) +
+    geom_histogram(binwidth = 1) +
+    xlab("Duración de películas en minutos") + 
+    theme_bw()
+```
+
+que diferencia!
+
+![](../images/pointer.png) **Ejercicio 1/Tarea 3** A entregar el **lunes 9 de octubre 2017** en tu carpeta dentro de carpeta `alumno` con el nombre ejercicio_eda_1 (entregar Rmd y html) 
+
+a. ¿Qué puedes decir de esta gráfica?
+b. ¿Cómo la modificas para agregar más ticks?
+c. Haz una gráfica que muestre que los picos de 7 y 90 minutos existían antes y después de 1980
+d. Existe la varaible `short` que indica si una película es "corta", ¿Qué gráfica puedes hacer para identificar el criterio que se ocupó para definir esta variable y cuáles están mal clasificadas? 
+
+*** 
+
+#### Datos categóricos
+
+¿Qué podemos encontrar?
+
++ Patrones insesperados en los resultados
++ Malas Distribuciones
++ Categorías extras
++ Experimentos no balanceados
++ Muchas categorías
++ "No sé", Errores, Faltantes
+
+![](../images/pointer.png) ¿Cómo podríamos visualizar estas características? 
+
++ **Barchars:** Nominales, Variables discretas
++ Explora (o ten cuidado con) diferentes ordenamientos
++ Es posible que datos ordinales entren también en este análisis
+
+#### Bivariado contínuo
+
+¿Qué podemos encontrar?
+
++ Relaciones lineales y no lineales
++ Asociaciones
++ Outliers: Se puede ser outlier en una dimensión y no serlo en dos, o viceversa
++ Clusters
++ Huecos
++ Barreras
++ Relación condicional
+
+Modelos y pruebas
+
++ Correlación
++ Smoothing
++ Regresión lineal $\rightarrow$ Verifica los supuestos!!!! 
+
+¿Regresión lineal? ... residuales 
+
+![](../images/oreally.png)
+
+
+#### Ejemplos
+
+Ahora veamos la varaible `rating` que representa el promedio de calificaciones de IMDB y la variable `votes` que representa el número de personas que calificaron la película
+
+```{r echo=T, warning=F, message=F, error=F}
+ggplot(movies, aes(x=votes, y=rating)) +
+  geom_point() +
+  ylim(1,10) + 
+  scale_x_continuous(label=comma) + 
+  theme_bw()
+```
+
+![](../images/pointer.png) **Ejercicio 2/Tarea 3** A entregar el **lunes 9 de octubre 2017** en tu carpeta dentro de carpeta `alumno` en el mismo archivo creado en el ejercicio 1
+
+a. Agrega `alpha-blending` ¿Qué pasa con los outliers? ¿Diferentes valores funcionan mejor?
+b. ¿Cómo se ve la gráfica si remueves las películas con menos de 100 votos?
+c. ¿Cómo se ve la gráfica si remueves todas las películas que tienen un rating arriba de 9?
+
+***
+
+Es posible estudiar posibles modelos (al igual que en el caso univariado) por ejemplo, ocupando el set de datos `Cars93` en el paquete MASS:
+
+```{r echo=T, warning=F, message=F, error=F}
+data("Cars93")
+
+ggplot(Cars93, aes(x=Weight, y=MPG.city)) +
+  geom_smooth(colour="green") +
+  ylim(0, 50) + 
+  scale_x_continuous(label=comma) +
+  geom_point() +
+  theme_bw() 
+```
+
+![](../images/pointer.png) **Ejercicio 3/Tarea 3** 
+
+a. ¿Cuál es el outlier de la izquierda?
+b. En muchos países en lugar de medirse en millas por galón, se mide en litros por 100 km. ¿Qué pasa si graficas `MPG.city` contra `Horsepower`? ¿Existe una relación lineal? ¿Cuáles son los outliers?
+
+*** 
+
+También se podemos hacer una matriz de scatterplots -**splom** (como lo hicimos con los histogramas :)), para ello ocupamos el método `ggpairs` de la librería `GGally` en el dataset de precios de vivienda ade Boston.
+
+```{r echo=T, message=F, error=F, warning=F}
+library(GGally)
+
+
+dplyr::select(Boston, -rad, -chas) %>% 
+ggpairs(title="Boston dataset", diag=list(continuous="density", axisLabels='none'))
+  
+```
+
+![](../images/pointer.png) **Ejercicio 4/Tarea 3** 
+
+a. ¿Cuáles están positivamente correlacionados con `medv`?
+b. La variable `crim` -tasa de crímenes per cápita- tiene *scatterplots* con forma inusual, donde los valores altos de `crim` solo ocurren para un valor de la otra variable ¿Qué explicación le puedes dar?
+c. Hay varias formas en los *scatterplots*, escoge 5 y explica cómo las interpretas
+
+*** 
+
+#### Más de 2 variables continuas
+
+Para ver variables variables continuas se puede ocupar el *parallel coordinate plot* **pcp**, estos diagramas permiten dar un vista rápida a las distribuciones univariadas de varias variables a la vez: si son skew, si hay outliers, si hay gaps, etc. 
+
+Ahora utilizaremos el dataset `iris` para probar estas gráficas utilziando de la librería `GGally` el método `ggparcoord`
+
+```{r echo=T, warning=F, error=F, message=F}
+data(iris)
+
+ggparcoord(iris, columns=1:4, groupColumn = "Species") 
+```
+
+Esta está más difícil de interpretar... 
+
+En un **pcp** cada línea es una observación del dataset, y cada atributo/variable del set es un punto en la gráfica. 
+
+Lo que uno observa en la gráfica depende del orden en el cuál se dibujan los ejes. Hay autores que sugieren intentar varias combinaciones o inclusive poner varias copias de los ejes. Quizá lo mejor sea tener una gráfica interactiva para tal efecto... lo veremos más adelante. 
+
+Este tipo de gráficas se puede usar para comparar modelos, series de tiempo, análisis de clusters, índices, etc. Esto lo discutiremos más adelante en el curso. Lo que se busca al ocupar esta gráfica es encontrar **similitudes** al comparar diferentes características del dataset.
+
+Hay varias cosas que ajustar en estas gráficas para poder ser interpretadas: el orden de las variables y el escalamiento de los datos. 
+
++ **Escalamiento:** Cuando vamos a comparar diferenes mediciones tenemos que determinar alguna manera de ponerlos en la misma escala. En las gráficas **pcp** por default, la escala depende del máximo y mínimo valor encontrado por cada variable, el mínimo a $0$ y el máximo se maperará a $1$ (o 0% y 100%) 
+
+$$y_{ij}=\frac{x_{ij} - \min_i x_{ij}}{\max_i x_{ij} - \min_i x_{ij}}$$
+
+Otra forma de escalar los datos es usando la desviación estándar o el rango intercuantil (IQR), por ejemplo: 
+
+$$z_{ij}=\frac{x_{ij} - \bar{x}_j}{sd(x_j)}$$
+
+Este es el escalamiento por default que ocupa `ggparcoord`.
+
+![](../images/pointer.png) La escala de cada variable es propia a esa variable, es decir, no se deben comparar las alturas entre diferentes variables (diferentes puntos en el eje x)
+
+```{r echo=T, warning=F, message=F, error=F}
+iris1 <- iris
+names(iris1) <- c(abbreviate(names(iris)[1:4]), "Species")
+a1 <- ggparcoord(iris1, columns = 1:4, 
+                 alphaLines = 0.7,  
+                 groupColumn = "Species") + 
+  ggtitle("a1")
+a2 <- ggparcoord(iris1, columns = 1:4, 
+                 scale="uniminmax", 
+                 alphaLines=0.7, 
+                 groupColumn = "Species") + 
+  ggtitle("a2")
+a3 <- ggparcoord(iris1, columns = 1:4, 
+                 scale="globalminmax", 
+                 alphaLines=0.7, 
+                 groupColumn = "Species") + 
+  ggtitle("a3")
+a4 <- ggparcoord(iris1, columns = 1:4, 
+                 scale="center", 
+                 scaleSummary="median", 
+                 alphaLines=0.7, 
+                 groupColumn = "Species") +
+  ggtitle("a4")
+
+gridExtra::grid.arrange(a1, a2, a3, a4)
+```
+
+![](../images/pointer.png) **Ejercicio 5/Tarea 3** 
+
+a. Usando el dataset `Boston` realiza un *pcp*, intenta resaltar las características que haz observado en los ejercicios anteriores. Piensa cómo le hiciste...
+
+*** 
+
+#### Varias variables categóricas
+
+Cuando queremos comparar varias variables categóricas al mismo tiempo tenemos el problema de que haya muchas categorías por variable y la gran cantidad de posibles ordenamientoso de las variables. Por ejemplo, para $J$ variables categóricas con $c$ número de categorías, las variables pueden ser ordenadas de $J!$ maneras diferentes y las categorías dentro de las variables de $\Pi_{j=1}^J c_j!$, lo cual da un total de $J!\Pi_{j=1}^Jc_j!$ ordenamientos, o sea un montón...
+
+Los tipos de gráficas que podemos ocupar en estas situaciones son: 
+
++ *mosaicplots*
++ *doubledecker plots*
++ *fluctuation diagrams*
++ *treemaps*
++ *association plots*
++ *parallel sets/categorical parallel coordinate plots*
+
+![](../images/pointer.png) [New approaches in Visualization of Categorical Data: R Package extracat de A. Pilhöfer y A. Unwin. JSS, Vol53 issue 7, May 2013.](https://www.jstatsoft.org/article/view/v053i07/v53i07.pdf)
+
+##### Doubledecker 
+
+En esta gráfica las variables se dividen en variables explicativas y variable objetivo, esta última ocupa el eje vertical 
+
+```{r echo=T, warning=F, message=F, error=F}
+library(vcd)
+
+data(Titanic)
+
+#variables a ocupar para hacer una tabla de contingencia, la variable tardet se pone al final
+doubledecker(Survived ~ Sex, data=Titanic, gp=gpar(fill=c("grey90", "darkblue")))
+
+doubledecker(Survived ~ Class, data=Titanic, gp=gpar(fill=c("grey90", "darkblue")))
+```
+
+<br>
+
+Conforme más variables agregamos se vuelve más difícil la interpretación: 
+
+```{r echo=T, warning=F, message=F, error=F}
+doubledecker(Survived ~ Sex + Class, data=Titanic, gp=gpar(fill=c("grey90", "darkblue")))
+```
+
+<br>
+
+Además, como mencionábamos, al ser una tabla de tipo *mosaic* la construcción de la gráfica depende del orden de las variables
+
+```{r echo=T, warning=F, message=F, error=F}
+doubledecker(Survived ~ Class + Sex, data=Titanic, gp=gpar(fill=c("grey90", "darkblue")))
+```
+
+<br>
+
+##### Mosaicplot
+
+En este tipo de gráfica ocupamos rectángulos proporcionales a los conteos de las combinaciones que los rectángulos representan. Se dibujan partiendo con un rectángulo que representa todo el *dataset*, luego se toma la primer variable y se parte el eje horizontal en secciones proporcionales a los tamaños de las categorías.
+
+```{r echo=T, warning=F, message=F, error=F}
+titanic <- as.data.frame(Titanic)
+par(mfrow=c(2,2),  mar= c(4, 4, 0.1, 0.1))
+mosaicplot(xtabs(Freq ~ Survived, data=titanic), main="")
+mosaicplot(xtabs(Freq ~ Survived + Sex, data=titanic), main="")
+mosaicplot(xtabs(Freq ~ Survived + Sex + Class, data=titanic), main="")
+mosaicplot(xtabs(Freq ~ Survived + Sex + Class + Age, data=titanic), main="")
+```
+
+De nuevo el orden de las variables determinará la apariencia (y tal vez el *insight* que puedes obtener)
+
+Otra opción es utilizar `pairs`
+
+```{r echo=T, warning=F, message=F, error=F}
+pairs(xtabs(Freq ~ ., data=titanic))
+```
+
+La diagonal de esta gráfica contiene gráficas de barra para las variables individuales y *mosaicplots* en los elementos que no están en la diagonal. Si hay muchas variables esta gráfica será muy difícil de leer.
+
+Si existe una variable a explicar obvia (en nuestro caso Survived), quizá sea mejor tomar esto en cuenta en nuestro análisis:
+
+```{r echo=T, warning=F, message=F, error=F}
+ggplot(titanic, aes(Survived, Freq, fill=Sex)) + 
+    geom_bar(stat = "identity") +
+    theme_bw() +
+    facet_grid(Class ~ Sex + Age) + theme(legend.position="none")
+```
+
+
+##### Fluctuation diagrams
+
+Si queremos observar tablas de contingencia muy grandes o matrices de confusión, podemos usar las gráficas de tipo *fluctile*. En particular estas gráficas resaltan qué subgrupos aparecen más frecuentemente, o cuales combinaciones no aparecen en lo absoluto.
+
+```{r echo=T, warning=F, error=F, message=F}
+library(extracat)
+
+#nota que requiere una tabla de entrada! no un data frame
+fluctile(Titanic)
+```
+
+Por otro lado, si solo nos interesa comparar las tasas, podemos usar la funcion `rmb` -*relative multiple barchar*- con el parámetro `freq.trans="const"`:
+
+```{r echo=T, warning=F, message=F, error=F}
+rmb(formula = ~ Sex + Class + Age + Survived, 
+              data=titanic, 
+              cat.ord=2, spine=TRUE, freq.trans="const")
+```
+
+En esta gráfica vemos las tasas de supervivencia (el color verde) por subgrupo. Esto sería muy difícil de apreciar con un *mosaicplot* normal.
+
+Las **rmb** mezclan las gráficas de barras y los *mosaicplots*.
+
+
+
+### Forma deseable de los datos
+
+Para muchos de los análisis de datos requerimos que los datos estén en formato *tidy*
+
++ ![](../images/pointer.png) [Artículo Tidy Hadley Wickham](http://vita.had.co.nz/papers/tidy-data.pdf)
++ También habrá ejemplos en los que no queremos que esté en formato *tidy* [Non Tidy Data](https://simplystatistics.org/2016/02/17/non-tidy-data/) + O grafos! (lo veremos más adelante)
+
+![Tidy Data](http://r4ds.had.co.nz/images/tidy-1.png)
+
+*Fuente: R for Data Science, Wickham and Grolemund, 2016*
+
+Es decir:
+
+1. Cada *variable* una columna
+2. Cada *observación* un renglón
+3. Cada *valor* una celda
+
+![](../images/data_analysis_and_cleaning.png)
+
+*Fuente: [Presentaciones de Hadley Wickham](http://vita.had.co.nz/papers/tidy-data-pres.pdf)*
+
+#### Formatos salvajes
+
+Los siguientes ejemplos de dataset son típicos de algunas fuentes de datos, por ejemplo: INEGI (al menos en formatos al 2014)
+
+||Lat|Long|Indicador|
+|:----:|:------:|:-------:|:--------:|
+|Obs1| \# | \# | \# | 
+
+
+Table: Fecha implícita
+
+| | lugar | indicador |
+|:---:|:-----:|:-----:|
+|obs 1 |  | |
+|obs 2 | |  |
+
+
+Table: Otro con Fecha implícita 
+
+| |Fecha 1 | Fecha 2 |
+|:---:|:-----:|:------:|
+|lugar 1|    |   |
+|lugar 2|  | |
+
+Table: Implícita la variable, ¿¿por qué?? (╯°□°)╯︵ ┻━┻
+
+|  |  Fecha 1 | Fecha 2 | ... |
+|:-----:|:-------:|:-------:|:------:|
+| **LUGAR 1** |   |    |   |  |
+| Ind 1 |   #  | #   | ... |
+| Ind 2 |   #  |  #   | ... |
+| **LUGAR 2** |   |    |   |  |
+| Ind 1 |   #  | #   | ... |
+| Ind 2 |   #  |  #   | ... |
+
+O cosas más locas! 
+
+||Indicador 1|Indicador 2|
+|:--:|:--:|:---:|
+
+||Fecha 1| Fecha 2| Fecha 1| Fecha 2|
+|:-----:|:--:|:-------:|:-----:|:-----:|
+|lugar 1| Ind 1| Ind 1 | Ind 2| Ind 2|
+|lugar 1| Ind 1| Ind 1 | Ind 2| Ind 2|
+
+Otro ejemplos: 
+
++ Nombres de las columnas representan valores de los datos en lugar de nombres de variables -el nombre de un lugar por ejemplo-
++ Una columna contiene varias variables en lugar de una variable 
++ Una tabla contiene más de una unidad de observación
++ Las variables están contenidas en los renglones y columnas, en lugar de sólo columnas.
++ Los datos de una unidad observacional están dispersas en varios *data sets*
+
+Ejemplos:
+
+```{r echo=TRUE, warning=FALSE, error=FALSE, message=FALSE}
+library(tidyr)
+
+messy <- data.frame(nombre=c("juan.perez.lopez","martha.lopez.benitez",
+                             "jesus.ramirez.perez","jose.martinez.lopez",
+                             "aurora.saldivar.salazar"),
+                    genero_edad=c("m.35","f.23","m.30","m.25","f.33"),
+                    time=c(1,3,4,5,6))
+
+messy
+```
+
+Tendríamos que dejarlo *tidy*:
+
++ Separando el nombre
+```{r echo=T, warning=F, error=F, message=F}
+semi_messy <- messy %>% separate(col=nombre, into=c("nombre",
+                                      "apellido_paterno",
+                                      "apellido_materno"), 
+                   sep="\\.")
+
+semi_messy
+```
+
++ Separando género y edad
+
+
+```{r echo=T, warning=F, error=F, message=F}
+clean <- semi_messy %>% separate(col=genero_edad, into=c("genero","edad"), 
+                   sep="\\.")
+
+clean
+```
+
+Otro ejemplo: ¿Qué está mal?
+
+```{r echo=T, warning=F, error=F, message=F}
+messy <- data.frame(pais=c(rep("Afganistan",4),
+                           rep("Brazil",4),
+                           rep("China",4)),
+                    year=c(rep(1999,2),rep(2000,2),
+                           rep(1999,2),rep(2000,2),
+                           rep(1999,2),rep(2000,2)),
+                    llave=c("casos","poblacion","casos","poblacion",
+                          "casos","poblacion","casos","poblacion",
+                          "casos","poblacion","casos","poblacion"),
+                    valor=c(75,1300000,134,1400000,
+                            10000,100000000,12000,120000000,
+                            56000,150000000,60000,170000000))
+
+messy
+```
+
+Lo deberíamos arreglar con: 
+
+```{r echo=TRUE, error=FALSE, message=FALSE, warning=FALSE}
+clean <- messy %>% spread(key=llave, value=valor, fill=NA)
+
+clean
+```
+
+El último
+
+```{r echo=TRUE, error=FALSE, message=FALSE, warning=FALSE}
+stocks <- data_frame(
+  time = as.Date('2009-01-01') + 0:9,
+  X = rnorm(10, 0, 1),
+  Y = rnorm(10, 0, 2),
+  Z = rnorm(10, 0, 4)
+)
+
+stocks
+
+stocks %>% gather(stock, price, -time)
+```
+
+### Casos de estudio
+
+#### Reprducibilidad
+
+En estos casos de estudio nos vamos a encontrar con nuestro primer tipo de *pipeline*, en este caso en particular, este *pipeline* no es para ejecutar grandes volúmenes de datos o para ejecutar contínuamente, sino para poder reproducir el proceso de exploración y modelado de datos.

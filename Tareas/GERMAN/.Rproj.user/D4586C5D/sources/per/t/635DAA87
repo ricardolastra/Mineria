@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1564497417758.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "279027380",
+    "id" : "635DAA87",
+    "lastKnownWriteTime" : 1508812603,
+    "last_content_update" : 1508812603,
+    "path" : "C:/Users/Administrador/Desktop/DOC/MINERIA/Tareas/GERMAN/02-clean.R",
+    "project_path" : "02-clean.R",
+    "properties" : {
+        "cursorPosition" : "1,27",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

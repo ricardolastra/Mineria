@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"German data / Parte 2- Análisis \"\nauthor: \"Ricardo Lastra\"\ndate: \"23 de octubre de 2017\"\noutput: html_document\n---\n\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\nsetwd(\"C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/\")\n```\n\n### Tarea 4/5\n\n#### Ejercicio función `clean`, `run`, ejercicio de `summary` y `tidy.rds`.\n\n#### Ejercicio\n\n`Crea en 03-eda.R en ambas carpetas: algas y german.`\n\nActualizamos las funciones de EDA automatico y funcion de `Plot Automatico`\n\n```{r echo=T, warning=F, error=F, message=F}\nsource(\"run.R\")\n```\n\n\nPara los negocios y otros propositos es donde se destinan los creditos de mayor monto \"$\".\n\n&nbsp;\n\n\nTambién observamos que existen mas creditos de 6, 12, 18, 24 y 36 meses, sin embargo existen créditos de periodos irregulares los cuales podrian ser restructuraciones o prórrogas de crédito.\n\n&nbsp;\n\n\n```{r echo=T, warning=T, error=F, message=F}\nsummary(data_tidy)\n```\n\nRevisamos con la funcion `summary` los datos de forma *tidy* y podemos ver que aun cuando ya tenemos una variable de `personal_status` la cual nos indica el estado civil de la persona, no nos brinda mucha información la variable, ya que contiene 2 o mas atributos para una misma variable. Se puede pensar que son secuencias de estados civiles en el tiempo, sin embargo no se puede confirmar la hipotesis.\n\n&nbsp;\n\n```{r echo=T, warning=T, error=F, message=F}\nggplot(data, aes(x=credit_history, fill=good_loan, color=good_loan)) + \n  geom_bar(position = position_stack(reverse = TRUE)) +\n  coord_flip() +\n  theme(legend.position = \"top\")\n```\n\nFinalmente, tenía la hipótesis de que la clasificación de los buenos o malos créditos dependian del historial de crédito. Es decir si la persona tenia una buena clasificación en su historial de crédito tendria una calificación \"buena\" de crédito o viceversa. Sin embargo observamos que hay calificaciones erróneas de crédito, por ejemplo en la variable que dice que los créditos son debidamente devueltos hasta el momento, la cual es una **\"variable positiva\"** hay calificaciones erróneas como **\"Crédito malo\"** en la variable de `good_loan` situación que genera una nueva hipótesis: La variable `good_loan` que cambiamos líneas atrás con la función `as.factor` viene mal clasificada de origén, por lo que al ponerle las etiquetas no nos dice la información correcta.  \n",
+    "created" : 1509415827121.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2902310219",
+    "id" : "15D0026D",
+    "lastKnownWriteTime" : 1508880840,
+    "last_content_update" : 1508880840,
+    "path" : "C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/german_geda_tarea4_rlc_reproducible.Rmd",
+    "project_path" : "german_geda_tarea4_rlc_reproducible.Rmd",
+    "properties" : {
+        "last_setup_crc32" : "",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

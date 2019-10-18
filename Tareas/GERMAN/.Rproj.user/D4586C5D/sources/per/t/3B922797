@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1564497413962.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3042916600",
+    "id" : "3B922797",
+    "lastKnownWriteTime" : 1508812568,
+    "last_content_update" : 1508812568,
+    "path" : "C:/Users/Administrador/Desktop/DOC/MINERIA/Tareas/GERMAN/01-prepare.R",
+    "project_path" : "01-prepare.R",
+    "properties" : {
+        "cursorPosition" : "4,13",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

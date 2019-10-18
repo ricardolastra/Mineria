@@ -1,0 +1,82 @@
+---
+title: "R Notebook German"
+output: html_notebook
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/german_toolset/")
+```
+
+### Tarea 6
+
+Actualizamos las funciones de EDA automatico y funcion de `Plot Automatico`, analisis de NA's y archivo de `toolset.R`
+
+```{r echo=T, warning=F, error=F, message=F}
+source("run.R")
+```
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+x <- as.data.frame(abs(is.na(data))) # df es un data.frame
+y <- x[which(sapply(x, sd) > 0)] 
+cor(y)
+```
+
+Al parecer no hay ninguna variable con Missings en el dataset de German.
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+summary(y)
+```
+
+Validamos con un summary y esta vacio el set de Missings.
+
+&nbsp;
+
+
+```{r results='asis', echo=T, warning=F, error=F, message=F}
+library(Amelia) #Libreria para graficar Missings, contribución de A. Nieto
+missmap(data, main="Grafica de Missings, todas las variables", 
+        col=c("red", "black"), legend=F) 
+```
+
+&nbsp;
+
+
+Revisamos visualmente cuales son las variables con Missings, y observamos que German **NO** tiene variables con Missings. 
+
+&nbsp;
+
+
+Exploramos para ver a que variables les podemos aplicar  la estrategia de **Centralidad**:
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+datan <- data %>%
+  select(-starts_with("a")) %>% 
+  select(-which(sapply(.,is.character)))
+par(mfrow=c(2, 4))
+colnames <- dimnames(datan)[[2]]
+for (i in 1:7) {
+  boxplot(datan[,i], main=colnames[i], col="lightblue")
+}
+```
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+anyNA(datan)
+```
+
+Revisamos si hay datos NA para aplicar funciones, pero no existen en German.
+
+&nbsp;
+
+Conclusiones anteriores: 
+
+Finalmente, tenía la hipótesis de que la clasificación de los buenos o malos créditos dependian del historial de crédito. Es decir si la persona tenia una buena clasificación en su historial de crédito tendria una calificación "buena" de crédito o viceversa. Sin embargo observamos que hay calificaciones erróneas de crédito, por ejemplo en la variable que dice que los créditos son debidamente devueltos hasta el momento, la cual es una **"variable positiva"** hay calificaciones erróneas como **"Crédito malo"** en la variable de `good_loan` situación que genera una nueva hipótesis: La variable `good_loan` que cambiamos líneas atrás con la función `as.factor` viene mal clasificada de origén, por lo que al ponerle las etiquetas no nos dice la información correcta.  

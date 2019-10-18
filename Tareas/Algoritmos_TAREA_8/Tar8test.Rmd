@@ -1,0 +1,101 @@
+---
+title: "Tarea 8 Feature engineering"
+author: "Abraham Nieto 51556 y Ricardo Lastra 160167"
+date: "18 de noviembre de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=T, warning=F, error=T, message=F}
+library(plyr)
+library(dplyr)
+library(ggplot2)
+source('utils.R')
+# Loading
+data(mtcars)#cargamos mtcars
+```
+
+&nbsp;
+
+###Ejercicios:
+
+1. Realizar los siguientes 4 metodos en R y Python.
+2. Agrega estos archivos en git en la carpeta alumnos/tu_carpeta/tarea_8/
+3. Ocupa el set de datos mtcars para probar tu método
+4. Puedes validar tus métodos con los que ya están implementados en scikit-learn -pero no les hagas wrap!-
+
+
+&nbsp;
+
+**Tarea 8/ejercicio 1**
+
+&nbsp;
+
+Implementa el método low_variability() en un archivo utils.R
+Implementa el método low_variability() en un archivo utils.py
+
+
+```{r echo=T, warning=F, error=T, message=F}
+medianas<-low_variability(mtcars,1.01,'mpg')#variables asignadas
+```
+&nbsp;
+
+**Tarea 8/ejercicio 2**
+
+&nbsp;
+
+Implementa el método correlation_filtering() en el archivo utils.R
+Implementa el método correlation_filtering() en el archivo utils.py
+Ocupa el data set de mtcars para probar tu método
+
+```{r echo=T, warning=F, error=T, message=F}
+bye=correlation_filtering(mtcars,'mpg',0.875)#vamos a asignar las variables a eliminar
+#se eliminan:
+bye
+```
+
+&nbsp;
+
+**Tarea 8/ejercicio 3**
+
+&nbsp;
+
+Implementa el método FCB_filtering() en el archivo utils.R
+Implementa el método FCB_filtering() en el archivo utils.py
+Ocupa el data set de mtcars para probar tu método
+
+```{r echo=T, warning=F, error=T, message=F}
+bye2=FCB_filtering(mtcars,.7,'mpg')#usamos umbral .7 paa definir alta correlación con el target y entre las
+#variables
+
+#las variables a conservar es:
+w<-select(mtcars,bye2)
+head(w)
+```
+
+&nbsp;
+
+**Tarea 8/ejercicio 4**
+
+&nbsp;
+
+Implementa el método forward_filtering() en utils.R
+Implementa el método forward_filtering() en utils.py
+Utiliza el data set de mtcars para probar tus métodos
+
+```{r echo=T, warning=F, error=T, message=F}
+
+features<-colnames(mtcars)
+features<-features[features!='mpg']#nos quedamos con las variables independientes
+
+sal<-forward_filtering(mtcars,'mpg',features)#aplicamos el filter forward
+print(paste0('las variables elegidas son:',sal))
+
+#nuestro dataframe quedaria asi
+select(mtcars,sal,mpg)
+
+```
+

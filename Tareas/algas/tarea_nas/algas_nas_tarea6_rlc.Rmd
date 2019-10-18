@@ -1,0 +1,392 @@
+---
+title: "Algas y German data - NA's "
+author: "Ricardo Lastra"
+date: "30 de octubre de 2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/algas/tarea_nas")
+```
+
+### Tarea 6
+
+&nbsp;
+
+#### Valores faltantes: `NAs`
+
+&nbsp;
+
+
+```{r echo=T, warning=F, error=T, message=F}
+source("run.R")
+```
+
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+x <- as.data.frame(abs(is.na(data))) # df es un data.frame
+y <- x[which(sapply(x, sd) > 0)] 
+cor(y)
+```
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+summary(y)
+```
+
+&nbsp;
+
+#### Ejercicio 1.
+
+    * Genera un reporte para ambos conjuntos de datos que indique el estado de los valores missing.
+    * Muestra la matriz de correlación faltante en una gráfica.
+    * ¿Qué puedes interpretar?
+
+&nbsp;
+
+##### **Reporte algas:**
+
+```{r results='asis', echo=T, warning=F, error=T, message=F}
+#install.packages("stargazer")
+library(stargazer)
+suma <- colSums(y)
+stargazer::stargazer(suma, type = "html", title = "Suma de Missings por Variable")
+```
+
+&nbsp;
+
+En la tabla anterior podemos observar que la variable `chla` es la que tiene mayor numero de Missings con 12 valores, seguida de la variable `cl` con 10 valores.
+
+&nbsp;
+
+```{r results='asis', echo=T, warning=F, error=F, message=F}
+#install.packages("kableExtra")
+library(knitr)
+library(kableExtra)
+porcentaje <- (colSums(y)/nrow(y))*100
+kable(porcentaje, format = "html",caption = "Porcentaje de Missings por Variable  % ")  %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F, position = "left")
+```
+
+6% y 5% son los mayores porcentajes de variables con missings y corresponden a las variables `chla` y `cl`  respectivamente. 
+
+&nbsp;
+
+
+```{r results='asis', echo=T, warning=F, error=F, message=F}
+kable(summary(y), format = "html",caption = "Summary table por Variable") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+&nbsp;
+
+
+```{r results='asis', echo=T, warning=F, error=F, message=F}
+library(Amelia) #Libreria para graficar Missings, contribución de A. Nieto
+missmap(data, main="Grafica de Missings, todas las variables", col=c("red", "black"), legend=F) 
+```
+
+Mostramos de una forma muy visual, cuales son las variables del dataset que contienen los Missings
+
+&nbsp;
+
+```{r results='asis', echo=T, warning=F, error=F, message=F}
+missmap(data %>% select("max_ph","min_o2","cl","no3","nh4","opo4","po4","chla"), main="Grafica de variables con Missings", 
+        col=c("red", "black"), legend=F) 
+```
+
+Observamos cuales son las variables de forma especifica que contienen Missings
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+ggcorr(y,low = "gray", mid = "yellow", high = "red", nbreaks = 5, label=T,label_size = 3) 
+```
+
+Por el momento podemos decir que las variables con Missings que mas estan correlacionadas son la `no3`, `nh4` y `opo4` en seguida de las variables `cl` y `chla`. La variable `max_ph` es la que menos correlacionada esta. En proximos ejemplos veremos la correlacion entre variables con y sin Missings.
+
+&nbsp;
+
+
+##### **Reporte GERMAN:**
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/")
+source("run.R")
+```
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+x <- as.data.frame(abs(is.na(data))) # df es un data.frame
+y <- x[which(sapply(x, sd) > 0)] 
+cor(y)
+```
+
+Al parecer no hay ninguna variable con Missings en el dataset de German.
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+summary(y)
+```
+
+Validamos con un summary y esta vacio el set de Missings.
+
+&nbsp;
+
+
+```{r results='asis', echo=T, warning=F, error=F, message=F}
+library(Amelia) #Libreria para graficar Missings, contribución de A. Nieto
+missmap(data, main="Grafica de Missings, todas las variables", 
+        col=c("red", "black"), legend=F) 
+```
+
+&nbsp;
+
+Revisamos visualmente cuales son las variables con Missings, y observamos que German **NO** tiene variables con Missings. 
+
+
+&nbsp;
+
+
+### Regresamos a Ejercicio `Algas` y observamos como en clase:
+
+&nbsp;
+
+```{r echo=T, warning=F, error=T, message=F}
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/algas/tarea_nas")
+source("run.R")
+```
+
+Contamos las observaciones con NA`s
+
+```{r}
+nrow(data[!complete.cases(data),])
+```
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+# Si queremos remover las que tengan más del 20% de NAs...
+data_con_NAs <- data[!complete.cases(data),]
+data <- data[-indices_con_NAs(data, 0.2),]
+dim(data)
+```
+
+&nbsp;
+
+Volvemos a contar observaciones.
+```{r}
+nrow(data[!complete.cases(data),])
+```
+
+&nbsp;
+
+#### Ejercicio 2.
+
+    * ¿A qué variables del set de datos de algas les puedes aplicar este procedimiento?
+    * ¿Qué puedes decir de german_data?
+    * A las variables que no se les puede aplicar, explica por qué no.
+    
+&nbsp;
+    
+Exploramos para ver a que variables les podemos aplicar  la estrategia de **Centralidad**:
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+datan <- data %>%
+  select(-starts_with("a")) %>% 
+  select(-which(sapply(.,is.character)))
+par(mfrow=c(2, 4))
+colnames <- dimnames(datan)[[2]]
+for (i in 1:8) {
+  boxplot(datan[,i], main=colnames[i], col="lightblue")
+}
+```
+&nbsp;
+
+Podemos aplicar el procedimiento a las variables:  `max_ph`,`cl`,`no3`, y quiza `nh4`, ya que su distribucion parece "normal" aunque puede ser engañoso por que los "outliers parecen muy amplios" si observamos que cada `boxplot` tiene escalas diferentes.
+
+De `German Data` no podemos aplicar lo mismo ya que no contiene Missings.
+
+A las variables que no se les puede aplicar es por que sus distribuciones son diferentes a la normal, y como el caso de las variables "opo4","po4"y "chla" los outliers son demasiados y en un rango muy amplio, lo cual no ayuda a imputar "sanamente" los missings.
+
+&nbsp;
+
+    * Esta decisión debe de ser reproducible, agrega a utils.R una función que impute en las variables con NAs el valor central (median si es numérica,  moda si es categórica). La función debe de tener la siguiente firma:
+    
+&nbsp;
+    
+```{r echo=T, warning=F, error=F, message=F, eval=FALSE}
+imputar_valor_central <- function(data, colnames){
+
+  data <- data.frame(data)
+  numericvars <- character(length = ncol(data))
+  charvars <- character(length = ncol(data))
+  colname <- names(data)
+  
+  for(i in seq_len(ncol(data))){
+    if(class(data[, i]) == "numeric") {
+      numericvars[i] <- colname[i]
+    }
+    else {
+      if(class(data[, i]) == "character") {
+        charvars[i] <- colname[i]
+      }
+    }
+  }
+  
+  subset_numeric <- data %>% 
+    select(one_of(numericvars))
+  subset_chr <- data %>% 
+    select(one_of(charvars))
+  
+  if(length(subset_numeric)!=0){
+    for(i in colnames){
+      subset_numeric[is.na(subset_numeric[,i]), i] <- mean(subset_numeric[,i], na.rm = TRUE)
+    }
+  }
+  else{
+    for(i in colnames){
+      subset_chr[is.na(subset_chr[,i]), i] <- getmode(subset_chr[,i], na.rm = TRUE)
+    }
+  }
+  return(cbind(subset_chr,subset_numeric))
+}
+```
+
+&nbsp;
+
+Despues de generar la funcion de `imputar_valor_central`, como se comento anteriormente aplicamos la estrategia de `centralidad` a la variable `cl`
+
+
+```{r echo=T, warning=F, error=F, message=F}
+data <- imputar_valor_central(data,{"cl"})
+```
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+modelo <- lm(po4 ~ opo4, data=data)
+modelo
+```
+
+&nbsp;
+
+#### Ejercicio 3.
+
+&nbsp;
+
+Crea una función que sustituya los NAs con el valor dado por la regresión lineal recién calculada (No automatices la regresión lineal) usando la siguiente firma:
+
+```{r, eval=FALSE}
+imputar_valor_lm <- function(data,vary,var_independiente, modelo) { 
+  if(lapply(data[,var_independiente],class)=="numeric"){
+    data[is.na(data[,vary] & is.na(data[,var_independiente])==FALSE),vary]<-
+      modelo$coefficients[1]+modelo$coefficients[2]*data[is.na(data[,vary]) & 
+                                                           is.na(data[,var_independiente])==FALSE,var_independiente]
+    
+    return(data)
+  }
+}
+```
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+data <- imputar_valor_lm(data,"po4","opo4",modelo)
+```
+
+Con el modelo de lm imputamos los valores de la variable dependitne "po4" y guardamos nuestro nuevo data set.
+
+&nbsp;
+
+```{r echo=T, warning=F, error=F, message=F}
+summary(modelo)
+summary(data)
+```
+
+    Revisamos cuantas variables con NA's tenemos aun en el data set. Estas las remplazaremos con distancias euclidianas con knn que nos brinda los pesos promedios basados en las "k" observaciones.
+
+&nbsp;
+
+#### Ejercicio 4.
+
+&nbsp;
+
+- Implementa una función que impute por similitud con la firma
+
+```{r, eval=FALSE}
+imputar_por_similitud <- function(data, num_vecinos) {
+  data <- data.frame(data)
+  numericvars <- character(length = ncol(data))
+  charvars <- character(length = ncol(data))
+  colname <- names(data)
+  
+  for(i in seq_len(ncol(data))){
+    if(class(data[, i]) == "numeric") {
+      numericvars[i] <- colname[i]
+    }
+    else {
+      if(class(data[, i]) == "character") {
+        charvars[i] <- colname[i]
+      }
+    }
+  }
+  
+  subset_numeric <- data %>% 
+    select(one_of(numericvars))
+  subset_chr <- data %>% 
+    select(one_of(charvars))
+  
+  if(length(subset_numeric)!=0){
+    knnOutput <- knnImputation(subset_numeric, k = num_vecinos, scale = T, meth = "weighAvg", distData = NULL)  #knn imputacion
+    
+    return(knnOutput)
+  }
+}
+```
+  
+    Como lo mencionamos anteriormente, la imputacion a traves de knn identifica las distancias mas cercanas de a las observaciones "k" basadas en la distancia euclidiana de estas. Asi pues se aplica para el data set de algas, y revisamos si existen variables aun con Na's.
+
+&nbsp;
+
+
+```{r echo=T, warning=F, error=F, message=F}
+data <- imputar_por_similitud(data,10)
+anyNA(data)
+```
+
+    Revisamos y ya no quedan variables con NA's en el data set.
+
+&nbsp;
+
+- Aplícalo a `algas` y `german`. 
+
+- ¿Son muy diferentes las estadísticas ignorando los `NAs` comparadas con este método?
+
+&nbsp;
+
+#### Ejercicio 5.
+
+&nbsp;
+
+- Este es un buen momento para dejar de duplicar código y concentrar 
+  todas las funciones de `utils.R` que se puedan reutilizar en un archivo `toolset.R`.
+  Ajusta tus demás archivos de acuerdo a este cambio -si aplica- 
+- Crea un `R notebook` para cada *dataset* utilizando los archivos reproducibles y el archivo
+  `toolset.R`. Incluye en estos `notebook` la estructura de los datos, *GEDA* transformaciones de los datos 
+  y observaciones pertinentes (como *outliers*, estructura de los datos faltantes). 
+  Explica los métodos de imputación que usaste (si fué necesario) y porqué los usaste.
+
+&nbsp;

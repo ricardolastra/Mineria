@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1511725833935.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2017154854",
+    "id" : "FBB09DE3",
+    "lastKnownWriteTime" : 1509498901,
+    "last_content_update" : 1509498901,
+    "path" : "C:/Users/FORANEA110/Desktop/MINERIA/Tareas/SQL/eda.Rmd",
+    "project_path" : "eda.Rmd",
+    "properties" : {
+        "cursorPosition" : "2261,11",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

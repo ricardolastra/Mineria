@@ -1,0 +1,4 @@
+"0","source(""run.R"")
+"
+"2","Error in library(vcd) : there is no package called ‘vcd’
+"

@@ -1,0 +1,512 @@
+library(rgdal)
+tempdir()
+tmp <- tempdir()
+url <- "http://personal.tcu.edu/kylewalker/data/mexico.zip"
+file <- basename(url)
+download.file(url, file)
+unzip(file, exdir = tmp)
+mexico <- readOGR(dsn = tmp, layer = "mexico", encoding = "UTF-8")
+head(mexico@data)
+pal <- colorQuantile("YlGn", NULL, n = 5)
+state_popup <- paste0("<strong>Estado: </strong>",
+mexico$name,
+"<br><strong>PIB per c?pita, miles de pesos, 2008: </strong>",
+mexico$gdp08)
+leaflet(data = mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(gdp08),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(gdp08),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(gdp08),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1)
+?colorQuantile
+leaflet(mexico) %>%
+addProviderTiles("MapBox", options = providerTileOptions(
+id = "mapbox.light",
+accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN')))
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron")
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron")%>%
+addPolygons(fillColor = ~pal(gdp08))
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron")%>%
+addPolygons(fillColor = ~pal(gdp08),fillOpacity = 0.8,)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron")%>%
+addPolygons(fillColor = ~pal(gdp08),fillOpacity = 0.7)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron")%>%
+addPolygons(fillColor = ~pal(gdp08),fillOpacity = 0.7,color = "#BDBDC3")
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron")%>%
+addPolygons(fillColor = ~pal(gdp08),fillOpacity = 0.7,color = "#BDBDC3",weight = 1)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(gdp08),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+mexico$gdp08
+mexico$name
+mexico$gdp08
+pal(gdp08)
+fillColor = ~pal(gdp08)
+colnames(crimet)
+crimet %>% group_by(ENTIDAD)
+crimet %>% group_by(ANO)
+crimet %>% group_by(ENTIDAD)%>%
+summarise(count = n())
+colnames(crimet)
+View(crimet)
+View(crimet)
+View(crimet)
+crimet %>%
+select(ANO,ENTIDAD,valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD)%>%
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD) %>%
+summarise(count = n())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD) %>%
+summarise(count = n()) %>%
+arrange(desc(count))
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD) %>%
+arrange(desc(ENTIDAD))
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD) %>%
+fileter(ANO == 2016)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+group_by(ENTIDAD) %>%
+filter(ANO == 2016)
+datae(movies)
+data(movies)
+library(ggplot2movies)
+data(movies)
+head(movies)
+movies %>%
+group_by(year) %>%
+filter(year < 1980)
+movies %>%
+group_by(year)
+head(movies)
+str(movies)
+movies %>%
+group_by(year)
+movies %>%
+group_by(length)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(n = sum(n))
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(n = sum(ENTIDAD))
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(count = n())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(count = n(valu))
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu) %>%
+summarise(valu = n())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(valu = n())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(valu = valu())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+count(valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(valu,ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(valu2==count(valu))
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(valu==count(valu))
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(count=n(),valu==count(valu))
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(count=n())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(count=count(valu))
+crimet$valu
+sum(crimet$valu)
+count(crimet$valu)
+count(crimet,valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+count(valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(n=n()) %>%
+count(valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(n=n())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise()
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu) %>%
+summarise(valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu) %>%
+count(valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu) %>%
+count(valu)
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu) %>%
+summarise(valu=n())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD,valu) %>%
+summarise(val=n())
+crimet %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+group_by(ENTIDAD) %>%
+summarise(val=n())
+crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)  %>%
+summarise(val=n())
+crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)
+crime2 <- crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016)
+summarise(crime2)
+crime2
+summarise(crime2)
+crime2
+summarise(crime2, test = sum(valu))
+crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(test = sum(valu))
+crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu))
+crime2 <- crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu))
+crime2
+View(crime2)
+crime2
+colorQuantile("YlGn", NULL, n = 5)
+mexico$name
+state_popup <- paste0("<strong>Entidad: </strong>",
+crime2$ENTIDAD,
+"<br><strong>Total de Crimenes 2016: </strong>",
+crime2$total)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(gdp08),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(total),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(total),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+mexico
+head(mexico@data)
+leaflet(crime2) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(total),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(crime2$total),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+head(mexico@data)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron")
+head(mexico@data)
+mexico$name
+crime2$ENTIDAD
+crimet %>%
+rename("CIUDAD DE MEXICO"="Distrito Federal")
+crimet %>%
+rename(c("CIUDAD DE MEXICO"="Distrito Federal"))
+crimet
+crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu))
+crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+replace_all("CIUDAD DE MEXICO"="Distrito Federal")
+library(stringr)
+crime2 <- crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+replace_all("CIUDAD DE MEXICO"="Distrito Federal")
+library(stringr)
+crime2 <- crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+replace("CIUDAD DE MEXICO"="Distrito Federal")
+crime2 <- crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+replace(ENTIDAD="CIUDAD DE MEXICO","Distrito Federal")
+crime2 <- crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+mutate(ENTIDAD=replace(ENTIDAD="CIUDAD DE MEXICO","Distrito Federal"))
+crime2 <- crimet %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+mutate(ENTIDAD=replace(crime2,ENTIDAD="CIUDAD DE MEXICO","Distrito Federal"))
+crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, "CIUDAD DE MEXICO", "Distrito Federal"))
+colnames(crimet)
+dim(crimet)
+crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, "CIUDAD DE MEXICO", "Distrito Federal"))
+crimet$ENTIDAD
+crimet$ENTIDAD %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD=="CIUDAD DE MEXICO", "Distrito Federal"))
+crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD="CIUDAD DE MEXICO", "Distrito Federal"))
+crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD=="CIUDAD DE MEXICO", "Distrito Federal"))
+crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD=="CIUDAD DE MEXICO", "Distrito Federal")) %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu))
+crime2 <- crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD=="CIUDAD DE MEXICO", "Distrito Federal")) %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu))
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(crime2$total),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+mexico$name
+crime2$ENTIDAD
+crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD=="CIUDAD DE MEXICO", "Distrito Federal")) %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+arrange_desc(ENTIDAD)
+crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD=="CIUDAD DE MEXICO", "Distrito Federal")) %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+arrange(ENTIDAD)
+crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD=="CIUDAD DE MEXICO", "Distrito Federal")) %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu))
+crime2 <- crimet %>%
+mutate(ENTIDAD=replace(ENTIDAD, ENTIDAD=="CIUDAD DE MEXICO", "Distrito Federal")) %>%
+group_by(ENTIDAD) %>%
+select(ANO,ENTIDAD,valu) %>%
+filter(ANO == 2016) %>%
+summarise(total = sum(valu)) %>%
+arrange(ENTIDAD)
+leaflet(mexico) %>%
+addProviderTiles("CartoDB.Positron") %>%
+addPolygons(fillColor = ~pal(crime2$total),
+fillOpacity = 0.8,
+color = "#BDBDC3",
+weight = 1,
+popup = state_popup)
+library(knitr)
+library(kableExtra)
+library(stargazer)
+library(tidyverse)
+library(grid)
+library(vcd)
+library(GGally)
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/algas/tarea_nas")
+missmap(data, main="Grafica de Missings, todas las variables",
+col=c("red", "black"), legend=F)
+library(Amelia)
+missmap(data, main="Grafica de Missings, todas las variables",
+col=c("red", "black"), legend=F)
+library(tidyverse)
+source("metadata.R")
+source("utils.R")
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/algas/tarea_nas")
+source("metadata.R")
+source("utils.R")

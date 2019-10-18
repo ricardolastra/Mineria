@@ -1,0 +1,52 @@
+---
+title: "Algas data - Análisis "
+author: "Ricardo Lastra"
+date: "23 de octubre de 2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/algas/")
+```
+
+### Tarea 5
+
+&nbsp;
+
+#### Ejercicio 
+
+  * Repite los pasos realizados para german.data con algas
+
+Se actualizó ruta de datos y archivos de `utils.R`, `00-load.R`, `01-prepare.R` (vacio), `02-clean.R` y `03-eda.R`. 
+
+
+```{r echo=T, warning=F, error=F, message=F}
+source("run.R")
+```
+
+
+&nbsp;
+
+#### Ejercicio 
+
+  * Revisa con summary(), reporta alguna anomalía.
+
+```{r echo=T, warning=T, error=F, message=F}
+summary(data)
+```
+
+Existen Outliers incoherentes en las variables a1-a7, esto lo notamos al revisar las medias de cada variable. Tambien observamos que existen muchos datos faltantes por cada variable, casi hasta un 10% de datos NA's.
+
+
+&nbsp;
+
+
+```{r echo=T, warning=T, error=F, message=F}
+glimpse(data)
+```
+
+&nbsp;
+
+

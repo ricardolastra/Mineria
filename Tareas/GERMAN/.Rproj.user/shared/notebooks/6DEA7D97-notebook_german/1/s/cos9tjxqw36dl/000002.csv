@@ -1,0 +1,7 @@
+"0","library(Amelia) #Libreria para graficar Missings, contribución de A. Nieto"
+"0","missmap(data, main=""Grafica de Missings, todas las variables"", "
+"0","        col=c(""red"", ""black""), legend=F) "
+"2","the condition has length > 1 and only the first element will be used"
+"2","Unknown or uninitialised column: 'arguments'."
+"2","Unknown or uninitialised column: 'arguments'."
+"2","Unknown or uninitialised column: 'imputations'."

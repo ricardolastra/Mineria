@@ -1,0 +1,7 @@
+"0","missmap(data, main=""Grafica de Missings, todas las variables"", 
+        col=c(""red"", ""black""), legend=F) 
+"
+"2","is.na() applied to non-(list or vector) of type 'closure'"
+"2","Error in colMeans(is.na(obj)) : 
+  'x' must be an array of at least two dimensions
+"

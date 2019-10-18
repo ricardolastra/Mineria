@@ -1,0 +1,5 @@
+"0","x <- as.data.frame(abs(is.na(data))) # df es un data.frame"
+"0","y <- x[which(sapply(x, sd) > 0)] "
+"0","cor(y)"
+"1","<0 x 0 matrix>
+"

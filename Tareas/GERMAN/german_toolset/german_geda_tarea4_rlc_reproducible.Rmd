@@ -1,0 +1,54 @@
+---
+title: "German data / Parte 2- Análisis "
+author: "Ricardo Lastra"
+date: "23 de octubre de 2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/")
+```
+
+### Tarea 4/5
+
+#### Ejercicio función `clean`, `run`, ejercicio de `summary` y `tidy.rds`.
+
+#### Ejercicio
+
+`Crea en 03-eda.R en ambas carpetas: algas y german.`
+
+Actualizamos las funciones de EDA automatico y funcion de `Plot Automatico`
+
+```{r echo=T, warning=F, error=F, message=F}
+source("run.R")
+```
+
+
+Para los negocios y otros propositos es donde se destinan los creditos de mayor monto "$".
+
+&nbsp;
+
+
+También observamos que existen mas creditos de 6, 12, 18, 24 y 36 meses, sin embargo existen créditos de periodos irregulares los cuales podrian ser restructuraciones o prórrogas de crédito.
+
+&nbsp;
+
+
+```{r echo=T, warning=T, error=F, message=F}
+summary(data_tidy)
+```
+
+Revisamos con la funcion `summary` los datos de forma *tidy* y podemos ver que aun cuando ya tenemos una variable de `personal_status` la cual nos indica el estado civil de la persona, no nos brinda mucha información la variable, ya que contiene 2 o mas atributos para una misma variable. Se puede pensar que son secuencias de estados civiles en el tiempo, sin embargo no se puede confirmar la hipotesis.
+
+&nbsp;
+
+```{r echo=T, warning=T, error=F, message=F}
+ggplot(data, aes(x=credit_history, fill=good_loan, color=good_loan)) + 
+  geom_bar(position = position_stack(reverse = TRUE)) +
+  coord_flip() +
+  theme(legend.position = "top")
+```
+
+Finalmente, tenía la hipótesis de que la clasificación de los buenos o malos créditos dependian del historial de crédito. Es decir si la persona tenia una buena clasificación en su historial de crédito tendria una calificación "buena" de crédito o viceversa. Sin embargo observamos que hay calificaciones erróneas de crédito, por ejemplo en la variable que dice que los créditos son debidamente devueltos hasta el momento, la cual es una **"variable positiva"** hay calificaciones erróneas como **"Crédito malo"** en la variable de `good_loan` situación que genera una nueva hipótesis: La variable `good_loan` que cambiamos líneas atrás con la función `as.factor` viene mal clasificada de origén, por lo que al ponerle las etiquetas no nos dice la información correcta.  

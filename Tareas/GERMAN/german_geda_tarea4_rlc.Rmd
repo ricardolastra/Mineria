@@ -1,0 +1,141 @@
+---
+title: "German data - Análisis "
+author: "Ricardo Lastra"
+date: "15 de octubre de 2017"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/")
+```
+
+## Tarea 4
+
+### Ejercicio función `load`, `german_decode` y EDA.
+
+GEDA GERMAN data análisis *medio exploratorio*.
+
+```{r echo=T, warning=T, error=F, message=F}
+#Cargamos librerias
+library(tidyverse)
+#link a la funcion "utils" en otra ruta
+source("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/utils.R")
+#Llamamos a la funcion load
+load(f)
+#Leemos el RDS en data
+data <- readRDS("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/german.rds")
+#Visualizamos data
+head(data)
+```
+
+&nbsp;
+
+Cambiamos las variables `X2`, `X5` y `X13` a `numeric` y  la variable categorica `good_loan` con `as.factor` como sigue:
+
+```{r echo=T, warning=T, error=F, message=F}
+#cambiamos de int a numeric
+data$X2 <- as.numeric(data$X2)
+data$X5 <- as.numeric(data$X5)
+data$X13 <- as.numeric(data$X13)
+
+source("C:/Users/FORANEA110/Desktop/MINERIA/Tareas/GERMAN/metadata.R")
+colnames(data) <- german_colnames
+
+data$good_loan <- as.factor(
+  ifelse(
+    data$good_loan == 1, 
+    'GoodLoan', 
+    'BadLoan'
+  )
+)
+```
+
+&nbsp;
+
+Usamos funcion `german_decode` para codificar data set según metadata
+
+```{r echo=T, warning=T, error=F, message=F}
+#Cargamos libreria
+library(tidyverse)
+#transformamos con funcion DECODE
+data <- data %>% 
+  mutate_all(funs(german_decode))
+str(data)
+```
+&nbsp;
+
+Cambiamos el nombre de algunos `column names` para que puedan ser utilizados con `ggplot`
+
+```{r echo=T, warning=T, error=F, message=F}
+colnames(data)[which(names(data) == "Credit amount")] <- "Credit_amount"
+colnames(data)[which(names(data) == "Duration in month")] <- "Duration_in_month"
+colnames(data)[which(names(data) == "Age in years")] <- "Age_in_years"
+colnames(data)[which(names(data) == "Credit history")] <- "Credit_history"
+```
+&nbsp;
+
+### Graficamos con `ggplot` donde observamos lo siguiente:
+
+```{r echo=T, warning=T, error=F, message=F}
+ggplot(data, aes(Purpose)) + geom_bar()
+
+```
+
+En la gráfica anterior podemos ver que hay mas creditos para el propósito de un credito para radio y televisión asi como para un auto nuevo.
+
+&nbsp;
+
+
+```{r echo=T, warning=T, error=F, message=F}
+
+ggplot(data, aes(Purpose, Credit_amount)) + geom_point(alpha=0.4)
+```
+
+Para los negocios y otros propositos es donde se destinan los creditos de mayor monto "$".
+
+&nbsp;
+
+```{r echo=T, warning=T, error=F, message=F}
+ggplot(data, aes(Duration_in_month, Credit_amount)) + 
+  geom_point(alpha=0.4) +
+  scale_x_continuous(breaks = seq(from = 0, to = 60, by = 2), lim = c(0,60))
+```
+
+También observamos que existen mas creditos de 6, 12, 18, 24 y 36 meses, sin embargo existen créditos de periodos irregulares los cuales podrian ser restructuraciones o prórrogas de crédito.
+
+&nbsp;
+
+```{r echo=T, warning=T, error=F, message=F}
+ggplot(data, aes(Age_in_years, Credit_amount)) + 
+  geom_dotplot(method="histodot", binwidth = 0.5) +  
+  scale_x_continuous(breaks = seq(from = 18, to = 76, by = 2), lim = c(18,76))
+```
+
+En la visualización anterior se observa que existen mayor numero de creditos y un mayor monto de los mismos en personas de edades entre **23 y 30** años.
+
+&nbsp;
+
+
+```{r echo=T, warning=T, error=F, message=F}
+ggplot(data, aes(Purpose, Age_in_years)) + geom_point(alpha=0.4)
+```
+
+El gráfico anterior es muy interesante, ya que podemos observar lo siguiente:
+
+      * Para autos, negocios, radio y television hay más créditos otorgados a personas de entre 20 y 40 años
+      * Para negocios y compra de autos, existen creditos otorgados a personas mas grandes de edad
+      * Los créditos otorgados a personas mas jovenes son destinados para "Furniture/equipment"
+
+&nbsp;
+
+
+```{r echo=T, warning=T, error=F, message=F}
+ggplot(data, aes(x=Credit_history, fill=good_loan, color=good_loan)) + 
+  geom_bar(position = position_stack(reverse = TRUE)) +
+  coord_flip() +
+  theme(legend.position = "top")
+```
+
+Finalmente, tenía la hipótesis de que la clasificación de los buenos o malos créditos dependian del historial de crédito. Es decir si la persona tenia una buena clasificación en su historial de crédito tendria una calificación "buena" de crédito o viceversa. Sin embargo observamos que hay calificaciones erróneas de crédito, por ejemplo en la variable que dice que los créditos son debidamente devueltos hasta el momento, la cual es una **"variable positiva"** hay calificaciones erróneas como **"Crédito malo"** en la variable de `good_loan` situación que genera una nueva hipótesis: La variable `good_loan` que cambiamos líneas atrás con la función `as.factor` viene mal clasificada de origén, por lo que al ponerle las etiquetas no nos dice la información correcta.  

@@ -1,0 +1,79 @@
+---
+title: "Tarea Opcional - Berka"
+author: "Abraham Nieto 51556 y Ricardo Lastra 160167"
+date: "26 de noviembre de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+&nbsp;
+
+```{r eval=F}
+instalar <- function(paquete) {
+
+    if (!require(paquete,character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)) {
+        install.packages(as.character(paquete), dependecies = TRUE, repos = "http://cran.us.r-project.org")
+        library(paquete, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
+    }
+}
+
+paquetes <- c('lubridate', 'magrittr', 'ggvis', 'dplyr', 'tidyr', 'readr', 'rvest', 
+              'ggplot2', 'stringr', 'ggthemes', 'googleVis', 'shiny', 'tibble', 'vcd', 'vcdExtra',
+              'GGally', 'readODS', 'readxl', "RSQLite")
+
+lapply(paquetes, instalar);
+```
+
+&nbsp;
+
+### SQLite3 & Dplyr
+
+&nbsp;
+
+#### Base de datos `Berka`
+
+&nbsp;
+
+```{r echo=T, warning=F, error=T, message=F}
+#library(dplyr)
+```
+
+&nbsp;
+
+#### Meta
+
+"El banco busca mejorar sus servicios, Por ejemplo, los admnistradores del banco 
+tienen únicamente una vaga idea de quién es un buen cliente (al cual ofrecerle
+más servicios) y quién es un mal cliente (alguien al que hay que cuidar para 
+minimizar las pérdidas del banco). Afortunadamente, el banco almacena datos 
+de sus clientes, sus cuentas (transacciones), préstamos que ya se otorgaron, 
+tarjetas de crédito dadas. Los administradaores del banco esperan mejorar
+su entendimiento de los clientes y mejorar así sus servicios. Una mera aplicación
+de una herramienta de *discovery* no los va a convencer."
+
+&nbsp;
+
+**Ejercicio: To Raw**
+
+Cargaremos los datos en `berka.raw`
+
+```{shell eval=FALSE}
+for db in *asc;
+do
+table=${db%.*}s
+if [ "$db" = "trans.asc" ]; then
+table="transactions"
+fi
+echo -e ".separator ';'\n.import ${db} ${table}" | sqlite3 berka.raw 
+done
+```
+
+&nbsp;
+
+dispositions_tbl
+
+
+&nbsp;

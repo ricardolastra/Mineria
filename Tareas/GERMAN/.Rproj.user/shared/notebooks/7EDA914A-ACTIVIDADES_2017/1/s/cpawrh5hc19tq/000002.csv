@@ -1,0 +1,3 @@
+"0","#Cruce por numero de serie de financiamientos terminados vs. toda la producción de autos"
+"0","#m=merge(fintermi, emiglobal, by.x= ""Num de Serie"", by.y = ""SERIE"")"
+"0","#head(m)"
